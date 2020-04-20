@@ -71,13 +71,16 @@ namespace Test
         }
 
     }
-   // public class DerivedJustClass : JustClass
+    // public class DerivedJustClass : JustClass
     //{
-       // public DerivedJustClass()
-      //  {
-        //}
+    // public DerivedJustClass()
+    //  {
     //}
+    //}
+    public readonly ref struct Test<T> where T : struct
+    {
 
+    }
     public class Program
     {
         public int Value { get; set; }
@@ -85,8 +88,14 @@ namespace Test
         //ConditionalWeakTable<>
         public static void Main(String[] args)
         {
-            int a = 1;
-            RefMeth(ref a);
+            new RefSerializator().BuildFieldsPrinter(typeof(CustomRefStruct));
+
+            //BenchmarkRunner.Run<SpanVSStringBuilder>();
+            //var res = Test<MyEnum>();
+            //var res2 = Test<MyEnum2>();
+            //Console.WriteLine(res + "     :     " + res2);
+            //int a = 1;
+            //RefMeth(ref a);
             //var jc = new JustClass();
             //Console.WriteLine(jc.A);
             //jc.GetType().GetFields().First().SetValue(jc, 1);
@@ -99,17 +108,33 @@ namespace Test
             //BoxCommonStruct();
             //BoxRefStruct();
             //RefMeth(Value);
-            
+
         }
 
-        public void Test<T>() where T : Exception
+        public static string Switch(MyEnum val) =>
+            val switch
+            {
+                MyEnum.First => "1",
+                MyEnum.Second => "2",
+                MyEnum.Third => "3",
+                {} => "",
+                //_ => "t"
+            };
+    
+        
+        public enum MyEnum
         {
-            try
-            {
-            }
-            catch (T)
-            {
-            }
+            First = 1,
+            Second = 2,
+            Third = 3,
+        }
+        public enum MyEnum2
+        {
+            First = 1
+        }
+        public static string Test<T>() where T : struct, Enum
+        {
+            return nameof(T);
         }
 
         public static void RefMeth(ref int val)
@@ -177,7 +202,7 @@ namespace Test
 
     public class Bench
     {
-        public class Report
+        /*public class Report
         {
             public int Count { get; set; }
             public List<Changesets> value { get; set; }
@@ -203,7 +228,7 @@ namespace Test
         }
 
         private string data = File.ReadAllText("C:\\Users\\hrrrrustic\\Downloads\\data.json");
-        [Benchmark]
+        //[Benchmark]
         public void Test1()
         {
             for (int i = 0; i < 1000; i++)
@@ -212,12 +237,131 @@ namespace Test
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void Test2()
         {
             for (int i = 0; i < 1000; i++)
             {
                 JsonConvert.DeserializeObject<CReport>(data);
+            }
+        }*/
+
+        public class TestClass
+        {
+            public string S1 { get; set; } = "TEST";
+            public string S2 { get; set; } = "TEST";
+            public string S3 { get; set; } = "TEST";
+            public string S4 { get; set; } = "TEST";
+            public string S5 { get; set; } = "TEST";
+            public string S6 { get; set; } = "TEST";
+            public int I1 { get; set; } = 1;
+            public int I2 { get; set; } = 1;
+            public int I3 { get; set; } = 1;
+        }
+        public ref struct TestRefStruct
+        {
+            public string S1 { get; set; }
+            public string S2 { get; set; }
+            public string S3 { get; set; }
+            public string S4 { get; set; }
+            public string S5 { get; set; }
+            public string S6 { get; set; }
+            public int I1 { get; set; }
+            public int I2 { get; set; }
+            public int I3 { get; set; }
+
+            public TestRefStruct(string str)
+            {
+                S1 = "TEST";
+                S2 = "TEST";
+                S3 = "TEST";
+                S4 = "TEST";
+                S5 = "TEST";
+                S6 = "TEST";
+                I1 = 1;
+                I2 = 1;
+                I3 = 1;
+            }
+        }
+
+        [Benchmark]
+        public void TestClassWork()
+        {
+            var instance = new TestRefStruct("ff");
+            for (int i = 0; i < 1000; i++)
+            {
+                MethodRefStruct(instance);
+            }
+        }
+
+        public void MethodRefStruct(TestRefStruct instance)
+        {
+            string str;
+            int i;
+            for (int j = 0; j < 10000; j++)
+            {
+                i = instance.I1;
+                i = instance.I2;
+                i = instance.I3;
+                str = instance.S1;
+                str = instance.S2;
+                str = instance.S3;
+                str = instance.S4;
+                str = instance.S5;
+                str = instance.S6;
+            }
+            for (int j = 0; j < 10000; j++)
+            {
+                instance.I1 = j;
+                instance.I2 = j;
+                instance.I3 = j;
+                instance.S1 = "TEST" + j;
+                instance.S2 = "TEST" + j;
+                instance.S3 = "TEST" + j;
+                instance.S4 = "TEST" + j;
+                instance.S5 = "TEST" + j;
+                instance.S6 = "TEST" + j;
+            }
+        }
+
+        [Benchmark]
+        public void TestRefStructWork()
+        {
+            var instance = new TestClass();
+            for (int i = 0; i < 1000; i++)
+            {
+                MethodClass(instance);
+            }
+        }
+
+        public void MethodClass(TestClass instance)
+        {
+            string str;
+            int i;
+            for (int j = 0; j < 10000; j++)
+            {
+                i = instance.I1;
+                i = instance.I2;
+                i = instance.I3;
+                str = instance.S1;
+                str = instance.S2;
+                str = instance.S3;
+                str = instance.S4;
+                str = instance.S5;
+                str = instance.S6;
+            }
+
+            for (int j = 0; j < 10000; j++)
+            {
+                instance.I1 = j;
+                instance.I2 = j;
+                instance.I3 = j;
+                instance.S1 = "TEST" + j;
+                instance.S2 = "TEST" + j;
+                instance.S3 = "TEST" + j;
+                instance.S4 = "TEST" + j;
+                instance.S5 = "TEST" + j;
+                instance.S6 = "TEST" + j;
             }
         }
     }
