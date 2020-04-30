@@ -24,7 +24,7 @@ namespace Test
         public Int32 Field2;
         public Int32 Field3;
 
-        public Test(int f1)
+        public Test(int f1f)
         {
             Field1 = 5;
             Field3 = 9;
@@ -59,17 +59,28 @@ namespace Test
         {
             return src;
         }
+
+        public static String TestSer<T>(this T val) where T : struct
+        {
+            return "";
+        }
     }
 
     public class JustClass
     {
         public readonly int A = 5;
-
+        public static String it { get; set; }
+        
+        public const Int32 CONST = 1;
         public JustClass(int t)
         {
             A = t;
         }
 
+        public int TEst()
+        {
+            return CONST;
+        }
     }
     // public class DerivedJustClass : JustClass
     //{
@@ -77,18 +88,41 @@ namespace Test
     //  {
     //}
     //}
-    public readonly ref struct Test<T> where T : struct
+    struct MyStruct
     {
-
+        public static explicit operator MyStruct(Test2 v)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public readonly ref struct Test2
+    {
     }
     public class Program
     {
-        public int Value { get; set; }
-
         //ConditionalWeakTable<>
         public static void Main(String[] args)
         {
-            new RefSerializator().BuildFieldsPrinter(typeof(CustomRefStruct));
+            var t = new JustClass(1);
+            Console.WriteLine(t.TEst());
+
+            t.GetType().GetFields(BindingFlags.Static | BindingFlags.Public).First().SetValue(t, 322);
+
+            
+            Console.WriteLine(t.TEst());
+            //new MyClass.CustomRefStruct(1, 1).TestSer();
+            //var res = typeof(RefSerializator<>)
+            //   .MakeGenericType(typeof(CustomRefStruct));
+            //var t = (MyStruct) (new Test2());
+            // var type = typeof(CustomRefStruct);
+
+            //var method = new DynamicMethod(Guid.NewGuid().ToString(),
+            //  typeof(void),
+            //   Array.Empty<Type>(), type);
+
+            //var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            //new RefSerializator().BuildFieldsPrinter(type);
 
             //BenchmarkRunner.Run<SpanVSStringBuilder>();
             //var res = Test<MyEnum>();
